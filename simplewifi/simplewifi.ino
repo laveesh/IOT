@@ -1,23 +1,62 @@
 #include <ESP8266WiFi.h>
+#include <ESP8266WebServer.h>
+
+const char* ssid = "Redmi";
+const char* password = "lavish98";
+//WiFi.mode(WIFI_AP);
+//WiFi.softAP("SKSingh_IoT","12345678");
 
 WiFiServer server(80); 
 int LED_PIN =16;
 void setup() {
+
+
+  
+  
   WiFi.mode(WIFI_AP);
   WiFi.softAP("gaurd_iot","87654321");
   server.begin();
-
+  //Static ip, gateway, netmask
+  WiFi.config(IPAddress(10,171,83,100), IPAddress(10,171,83,148), IPAddress(255,255,255,0));
 
   Serial.begin(9600);
   IPAddress HTTPS_ServerIP=WiFi.softAPIP();
-  Serial.print("Serial IP is: ");
-  Serial.println(HTTPS_ServerIP);
+  //Serial.print("Serial IP is: ");
+  //Serial.println(HTTPS_ServerIP);
 
   pinMode (LED_PIN, OUTPUT);
   digitalWrite (LED_PIN, LOW);
+
+  //connect to wifi network
+     Serial.println();
+     Serial.println();
+     Serial.print("Connecting to");
+     Serial.println(ssid);
+
+     WiFi.begin(ssid,password);
+
+     while(WiFi.status()!=WL_CONNECTED){
+      delay(500);
+      Serial.print(".");
+     }
+     Serial.println("");
+     Serial.println("WIFI Connected");
+
+     //start the server
+     server.begin();
+     Serial.println("Server Started");
+
+     //print IP address
+     Serial.print("Use This url to connect");
+     Serial.print("http://");
+     Serial.print(WiFi.localIP());
+     Serial.print("/");
+     
 }
 
 void loop() {
+    //server.handelClient();
+    
   // put your main code here, to run repeatedly: 
   WiFiClient client = server.available();
   if (!client) {
@@ -50,5 +89,7 @@ void loop() {
      client.println(s);
      delay(1);
      Serial.println("Client disconnected");
+
+     
     
 }
